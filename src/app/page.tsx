@@ -1,49 +1,104 @@
 'use client';
 
 import Image from "next/image";
-import { useState } from "react";
+import { act, useState } from "react";
+
+// Font awesome
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSun, faMoon, faAddressCard, faFolderOpen, faEnvelope } from "@fortawesome/free-regular-svg-icons";
+import { faVolumeHigh } from "@fortawesome/free-solid-svg-icons/faVolumeHigh";
+import { faVolumeMute } from "@fortawesome/free-solid-svg-icons/faVolumeMute";
+
+// Components
+import Tab from "@/app/components/tab";
+import TabButton from "@/app/components/tabButton";
+
+function updateTabsList(activeTabs: string[], tabName: string, removeTab?: boolean) {
+  // Check if the tabName is already in the activeTabs array
+  if(!activeTabs.includes(tabName)) {
+    // Add the new tabName to the array
+    activeTabs = [...activeTabs, tabName]; 
+  }
+  else if(removeTab === true) {
+    // Remove the tabName from the array
+    activeTabs = activeTabs.filter((tab) => tab !== tabName);
+  }
+  return activeTabs;
+}
 
 export default function Home() {
   const [darkMode, setDarkMode] = useState(false);
+  const [activeTabs, setActiveTabs] = useState<string[]>(["Home"]); // State to track the active tab
 
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <header>
-        <button>Dark Mode</button>
-        <button>Volume</button>
+    // DEBUG: SWITCHED FROM PALETTE TO WHITE
+    <div className="bg-white grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
+      {/* Change the rooot text colour in the style sheet when implementing dark mode */}
+      <header className="text-palette-5">
+        <button><FontAwesomeIcon icon={faSun}/></button>
+        <button><FontAwesomeIcon icon={faMoon}/></button>
+        <button><FontAwesomeIcon icon={faVolumeHigh}/></button>
+        <button><FontAwesomeIcon icon={faVolumeMute}/></button>
       </header>
       <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <div className="rounded-sm border border-white">
-          <div>Home</div>    
+        {/* Place the Tab at the centre of the page */}
+        <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+          <Tab tabName={"Home"} draggable={false} hideButton={true}>
+            <div className="flex flex-col items-center gap-2 p-10">
+                <h1 className="text-5xl">Abdullahi Ja'afar</h1>
+                <p>Web developer, Unity developer</p>
+            </div>
+            {/* DEBUG: BORDER */}
+            <div className="grid grid-flow-col px-10 pb-5 justify-items-center border-2">
+                <TabButton buttonName="About Me" onClick={() => setActiveTabs(updateTabsList(activeTabs, "About Me"))}>
+                  <FontAwesomeIcon icon={faAddressCard} size="3x"/>
+                </TabButton>
+                <TabButton buttonName="Projects" onClick={() => setActiveTabs(updateTabsList(activeTabs, "Projects"))}>
+                  <FontAwesomeIcon icon={faFolderOpen} size="3x"/>
+                </TabButton>
+                <TabButton buttonName="Contact" onClick={() => setActiveTabs(updateTabsList(activeTabs, "Contact"))}>
+                  <FontAwesomeIcon icon={faEnvelope} size="3x"/>
+                </TabButton>
+            </div>
+          </Tab>
         </div>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+        {/* Individual tab content placed at the centre of the page*/}
+        <div className="mt-8">
+          <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none">
+            {activeTabs.includes("About Me") && (
+                <Tab 
+                  tabName="About Me"
+                  onClose={(tabName) => setActiveTabs(updateTabsList(activeTabs, tabName, true))}
+                >
+                    <p>This is the About Me tab content.</p>
+                </Tab>
+            )}
+          </div>
+          <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none">
+            {activeTabs.includes("Projects") && (
+                <Tab 
+                  tabName="Projects"
+                  onClose={(tabName) => setActiveTabs(updateTabsList(activeTabs, tabName, true))}
+                >
+                    <p>This is the Projects tab content.</p>
+                </Tab>
+            )}
+          </div>
+          <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none">
+            {activeTabs.includes("Contact") && (
+                <Tab 
+                  tabName="Contact"
+                  onClose={(tabName) => setActiveTabs(updateTabsList(activeTabs, tabName, true))}
+>
+                    <p>This is the Contact tab content.</p>
+                </Tab>
+            )}
+          </div>
         </div>
+
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
+      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center text-black">
         <a
           className="flex items-center gap-2 hover:underline hover:underline-offset-4"
           href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
